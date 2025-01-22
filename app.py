@@ -2,9 +2,9 @@ import os
 import numpy as np
 import pandas as pd
 import joblib as jlib
-from flask import Flask,render_template,request,jsonify,Response,redirect,url_for
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
+from flask import Flask,render_template,request,jsonify
 from sklearn.metrics import accuracy_score,classification_report,confusion_matrix
 
 
@@ -30,18 +30,17 @@ def trainer():
         print(filepath)
         try:
             ds=pd.read_csv(filepath,usecols=['Hydraulic_Pressure(bar)','Coolant_Pressure(bar)','Hydraulic_Oil_Temperature(?C)','Coolant_Temperature','Downtime'])
-            ds=ds.dropna()
+            ds=ds.dropna() # Delete NaN values 
             print(ds)
-            # exclude=['Date','Machine_ID','Assembly_Line_No','Downtime']
-            # x=ds.drop(columns=exclude)
             x=ds[['Hydraulic_Pressure(bar)','Coolant_Pressure(bar)','Hydraulic_Oil_Temperature(?C)','Coolant_Temperature']]
             y=ds['Downtime']
-            print(x.shape)
+            
             xtrain,xtest,ytrain,ytest=train_test_split(x,y,test_size=0.5,random_state=42)
 
             model=RandomForestClassifier(n_jobs=-1,verbose=False)
             model.fit(xtrain,ytrain)
             jlib.dump(model,'./models/MacDown.pkl')        
+            
             modelpred=model.predict(xtest)
 
             print("Model Accuracy ::",accuracy_score(ytest,modelpred))
@@ -55,19 +54,22 @@ def trainer():
 
 @app.route('/submit',methods=['POST'])
 def Model():
-    # CoolantTemperature=request.form.get('CoolantTemperature')
-    # HydraulicPressure=request.form.get('HydraulicPressure')
     userinput=request.get_json();
     print('Request is json::',request.is_json)
+    
     HydraulicPressure=userinput.get('HydraulicPressure')
     CoolantPressure=userinput.get('CoolantPressure')
     HydraulicOilTemperature=userinput.get('HydraulicOilTemperature')
     CoolantTemperature=userinput.get('CoolantTemperature')
+    
     test=[HydraulicPressure,CoolantPressure,HydraulicOilTemperature,CoolantTemperature,]
     test=np.array(test)
+    
     model=jlib.load('./models/MacDown.pkl')
+    
     prediction=model.predict(test.reshape(1,-1))
     prediction=prediction[0]
+    
     result={'Downtime ':f'{prediction}'}
     if request.is_json:
         print(result)
