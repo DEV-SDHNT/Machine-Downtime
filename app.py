@@ -2,10 +2,8 @@ import os
 import numpy as np
 import pandas as pd
 import joblib as jlib
-import json
 from flask import Flask,render_template,request,jsonify,Response
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score,classification_report,confusion_matrix
 
@@ -43,7 +41,7 @@ def trainer():
 
             model=RandomForestClassifier(n_jobs=-1,verbose=True)
             model.fit(xtrain,ytrain)
-            jlib.dump(model,'MacDown.pkl')        
+            jlib.dump(model,'./models/MacDown.pkl')        
             modelpred=model.predict(xtest)
 
             print("Model Accuracy ::",accuracy_score(ytest,modelpred))
