@@ -1,8 +1,5 @@
 # Machine Downtime Prediction using Machine Learning
 
----
-
-
 ## Libraries Used :
 
 #### Scikit-Learn
@@ -14,6 +11,8 @@
 ![Alt text](Metrics.jpg)
 
 ## How to Run :
+Clone the repo & run below commands -
+
 ### Windows :	
 	py app.py
 
