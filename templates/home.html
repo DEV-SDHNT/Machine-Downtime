@@ -6,16 +6,38 @@
     <title>Machine Downtime </title>
     <style>
         body{
-            background:#aaa;
+            background:#efe;
+        }
+        h1{
+            text-align:center;
+        }
+        form{
+            position:fixed;
+            left:50%;
+            top:50%;
+            transform:translate(-50%,-50%);
+        }
+        input[type='file']{
+            margin-top:10px;
+            background:#999;
+            padding:10px;
+        }
+        button{
+            margin-top:20px;
+            height:40px;
+            width:90px;
+            background-color:#777;
+            border:none;
+            border-radius:10px;
         }
     </style>
 </head>
 <body>
-    <h1>Machine Downtime Analyzer</h1>
+    <h1>Machine Downtime Predictor</h1>
     <form method="POST" action='/model' enctype="multipart/form-data">
-        <label>Upload Dataset :
-        <input type='file' name='file' accept='.csv' >
-        <input type="Submit" value="Upload & Train">
+        <label for='file'>Upload Dataset (.csv):</label><br>
+        <input type='file' name='file' id="file" accept='.csv' ><br>
+        <button type="Submit">Upload & Train</button>
     </form>
 </body>
 </html>

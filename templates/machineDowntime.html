@@ -59,6 +59,11 @@
             const coolantPressure=parseInt(document.getElementById('CoolantPressure').value);
             const hydraulicOilTemperature=parseInt(document.getElementById('HydraulicOilTemperature').value);
             const coolantTemp=parseInt(document.getElementById('CoolantTemperature').value);
+            if(isNaN(hydraulicPressure)|| isNaN(coolantPressure) || isNaN(hydraulicOilTemperature) || isNaN(coolantTemp)){
+                alert("Enter numbers in the fields. !!");
+                document.write("Refresh !!!")
+            }
+            else{
             document.write("");
             const response=fetch('/submit',{
                 method:'POST',
@@ -74,6 +79,7 @@
             })
             .catch(error=>{console.error(error);}); 
         }
+    }
     </script>
 </body>
 </html>
