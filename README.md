@@ -10,10 +10,12 @@
 #### Flask
 #### Numpy
 
+## Model Metrics :
+![Alt text](Metrics.jpg)
 
 ## How to Run :
 ### Windows :	
 	py app.py
 
-### Linux / Mac
+### Linux / Mac :
 	python3 app.py
