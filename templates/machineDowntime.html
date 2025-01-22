@@ -1,33 +1,70 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Machine Downtime</title>
+    <style>
+        h1{ 
+            text-align:center;
+            color:#444;
+        }
+        form{
+            position:fixed;
+            height:300px;
+            width:300px;
+            top:50%;
+            left:50%;
+            transform:translate(-50%,-50%);
+        }
+        label{
+            font-size:20px;
+        }
+        input{
+            margin-bottom:20px;
+            height:30px;
+            border:solid 1px black;
+            border-radius:10px;
+        }
+        button{
+            height:40px;
+            width:60px;
+            background-color:#333;
+            color:white;
+            border:none;
+            text-align:center;
+            font-size:14px;
+            border-radius:10px;
+        }
+    </style>
 </head>
 <body>
     <h1>Machine Downtime Predictor</h1>
-    <form id="userForm" action='/modeltest'  method="POST" enctype='application/json'>
-        <label for="HydraulicPressure">Hydralic Pressure :</label>
+    <form id="userForm" action='/submit'  method="POST" enctype='application/json'>
+        <label for="HydraulicPressure">Hydralic Pressure</label>
         <input type="text" name="HydraulicPressure" id="HydraulicPressure"><br>
-        <label for="CoolantTemperature">Coolant Temperature :</label>
+        <label for="CoolantPressure">Coolant Pressure</label>
+        <input type="text" name="CoolantPressure" id="CoolantPressure"><br>
+        <label for="HydraulicOilTemperature">Hydralic Oil Temperature</label>
+        <input type="text" name="HydraulicOilTemperature" id="HydraulicOilTemperature"><br>
+        <label for="CoolantTemperature">Coolant Temperature</label>
         <input type="text" name="CoolantTemperature" id="CoolantTemperature"><br>
-        <button type='submit' onClick="submitForm()">Predict</button>
-        <p id="response"></p>
+        <button onClick="submitForm()">Predict</button>
+        <p id="output"></p>
     </form>
     <script>
-        function submitForm(){
-            const hydraulicPressure=document.getElementById('HydraulicPressure').value;
-            const coolantTemp=document.getElementById('CoolantTemperature').value;
-            document.write("\n");
-            const op=document.getElementById('response');
-            
-            fetch('/modeltest',{
+        function submitForm(event){
+            //event.preventDefault();
+            const hydraulicPressure=parseInt(document.getElementById('HydraulicPressure').value);
+            const coolantPressure=parseInt(document.getElementById('CoolantPressure').value);
+            const hydraulicOilTemperature=parseInt(document.getElementById('HydraulicOilTemperature').value);
+            const coolantTemp=parseInt(document.getElementById('CoolantTemperature').value);
+            document.write("");
+            const response=fetch('/submit',{
                 method:'POST',
                 headers:{
                     'Content-Type':'application/json'
                 }, 
-                body:JSON.stringify({HydraulicPressure:hydraulicPressure,CoolantTemperature:coolantTemp}),
+                body:JSON.stringify({HydraulicPressure:hydraulicPressure,CoolantPressure:coolantPressure,HydraulicOilTemperature:hydraulicOilTemperature,CoolantTemperature:coolantTemp}),
             })
             .then(response=>response.json())
             .then(data=>{

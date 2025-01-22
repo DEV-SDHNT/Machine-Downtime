@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import joblib as jlib
-from flask import Flask,render_template,request,jsonify,Response
+from flask import Flask,render_template,request,jsonify,Response,redirect,url_for
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score,classification_report,confusion_matrix
@@ -17,7 +17,7 @@ os.makedirs(app.config['UPLOAD_FOLDER'],exist_ok=True)
 def home():
     return render_template('home.html')
 
-@app.route("/upload",methods=['POST'])
+@app.route("/model",methods=['POST'])
 def trainer():
     if 'file' not in request.files:
         return "No file in the request",400
@@ -29,17 +29,17 @@ def trainer():
         file.save(filepath)
         print(filepath)
         try:
-            ds=pd.read_csv(filepath,usecols=['Hydraulic_Pressure(bar)','Coolant_Temperature','Downtime'])
+            ds=pd.read_csv(filepath,usecols=['Hydraulic_Pressure(bar)','Coolant_Pressure(bar)','Hydraulic_Oil_Temperature(?C)','Coolant_Temperature','Downtime'])
             ds=ds.dropna()
             print(ds)
             # exclude=['Date','Machine_ID','Assembly_Line_No','Downtime']
             # x=ds.drop(columns=exclude)
-            x=ds[['Hydraulic_Pressure(bar)','Coolant_Temperature']]
+            x=ds[['Hydraulic_Pressure(bar)','Coolant_Pressure(bar)','Hydraulic_Oil_Temperature(?C)','Coolant_Temperature']]
             y=ds['Downtime']
             print(x.shape)
-            xtrain,xtest,ytrain,ytest=train_test_split(x,y,test_size=0.3,random_state=43)
+            xtrain,xtest,ytrain,ytest=train_test_split(x,y,test_size=0.5,random_state=42)
 
-            model=RandomForestClassifier(n_jobs=-1,verbose=True)
+            model=RandomForestClassifier(n_jobs=-1,verbose=False)
             model.fit(xtrain,ytrain)
             jlib.dump(model,'./models/MacDown.pkl')        
             modelpred=model.predict(xtest)
@@ -53,20 +53,19 @@ def trainer():
     else:
         return 'Invalid file format',400
 
-@app.route('/modeltest',methods=['POST'])
+@app.route('/submit',methods=['POST'])
 def Model():
     # CoolantTemperature=request.form.get('CoolantTemperature')
     # HydraulicPressure=request.form.get('HydraulicPressure')
-    print("Model testing")
     userinput=request.get_json();
     print('Request is json::',request.is_json)
     HydraulicPressure=userinput.get('HydraulicPressure')
+    CoolantPressure=userinput.get('CoolantPressure')
+    HydraulicOilTemperature=userinput.get('HydraulicOilTemperature')
     CoolantTemperature=userinput.get('CoolantTemperature')
-    test=[HydraulicPressure,CoolantTemperature]
-    print(test)
+    test=[HydraulicPressure,CoolantPressure,HydraulicOilTemperature,CoolantTemperature,]
     test=np.array(test)
-    test.reshape(1,-1)
-    model=jlib.load('MacDown.pkl')
+    model=jlib.load('./models/MacDown.pkl')
     prediction=model.predict(test.reshape(1,-1))
     prediction=prediction[0]
     result={'Downtime ':f'{prediction}'}
